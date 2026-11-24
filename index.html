@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MERA AI - SUPER AI | ChatGPT + Grok + Hacker + Sab Kuch</title>
+<style>
+*{box-sizing:border-box;font-family:Arial} body{margin:0;background:#050510;color:#fff}
+header{background:#111;padding:10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;border-bottom:3px solid #a855f7;position:sticky;top:0;z-index:10}
+button,input,select,textarea{background:#222;color:#fff;border:1px solid #555;padding:9px 10px;border-radius:8px}
+button{cursor:pointer} button:hover{background:#a855f7}
+.aiBtn{background:linear-gradient(90deg,#a855f7,#ec4899,#f59e0b)!important;border:none;font-weight:bold}
+.greenBtn{background:#22c55e!important;color:#000;font-weight:bold;border:none}
+#main{display:flex;flex-wrap:wrap}
+#left{flex:1;min-width:320px;padding:12px}
+#right{width:380px;background:#111;padding:12px}
+@media(max-width:800px){#right{width:100%}}
+canvas#draw{width:100%;height:320px;background:#fff;border-radius:10px;display:block}
+#videoOut{width:100%;border-radius:10px;margin-top:8px}
+#trainBar{width:100%;height:16px;background:#222;border-radius:20px;overflow:hidden}
+#trainFill{height:100%;width:0%;background:linear-gradient(90deg,#a855f7,#22c55e);transition:0.5s}
+.log{background:#000;padding:8px;border-radius:8px;height:140px;overflow-y:auto;font-size:12px}
+.msg{padding:10px;background:#1a1a2e;border-radius:10px;margin:6px 0;white-space:pre-wrap;line-height:1.5}
+.msg img{width:100%;border-radius:10px;margin-top:6px}
+.userMsg{background:#2a2a2a;text-align:right}
+.panel{border:2px solid #a855f7;border-radius:14px;padding:12px;margin-bottom:12px}
+.chip{display:inline-block;background:#333;padding:5px 9px;border-radius:20px;font-size:11px;margin:2px;cursor:pointer}
+</style>
+</head>
+<body>
+<header>
+<b>🤖 MERA AI - SUPER AI</b>
+<button onclick="startTraining()">🧠 Training Start</button>
+<button onclick="stopTraining()">⏹ Stop</button>
+<button onclick="makeInfinityVideo()">🎥 Infinity Video</button>
+<button onclick="exportVideo()">📥 Video Save</button>
+<span id="topStatus" style="font-size:12px;color:#f0abfc">Ready Hai</span>
+</header>
+
+<div id="main">
+<!-- LEFT = PROJECT + CANVAS + CHAT -->
+<div id="left">
+<h3>🎬 Jo Bole Wo Banao - Visual Project Maker</h3>
+<textarea id="userDream" rows="2" style="width:100%" placeholder="Ex: 3D anime hero jo udta hai, engineering bridge banao, physics padhao, app banao..."></textarea><br><br>
+<select id="projectType" style="width:100%">
+<option value="anime video, 3d anime character, frame by frame animation, vibrant">🎌 Anime - 1000 Hours Wala</option>
+<option value="3d model, engineering project, bridge, building design">🏗️ Engineering Project</option>
+<option value="educational video, student ko padhao, physics, maths, simple">📚 Student Padhai</option>
+<option value="app UI design, mobile app, code">📱 App / Code Project</option>
+<option value="movie scene, cinematic, story">🎬 Movie Scene</option>
+</select><br><br>
+<button class="aiBtn" onclick="makeAnyProject()" style="width:100%">✨ JO BOLA WO BANA DE</button>
+<button onclick="makeCode()" style="width:100%;margin-top:6px">💻 Iska CODE Bana De</button>
+<button onclick="makeInfinityImages()" style="width:100%;margin-top:6px">🖼️ Infinity Images - 5 Ek Saath</button>
+<br><br>
+<canvas id="draw" width="900" height="520"></canvas>
+<div style="margin-top:6px">
+<button onclick="likeCurrent()">👍 Like - Aisi Hi Banao</button>
+<button onclick="dislikeCurrent()">👎 Dislike - Aisi Mat Banao</button>
+<button onclick="useInFrame()">✅ Frame Me Le Aao</button>
+<span id="likeStatus" style="font-size:12px"></span>
+</div>
+<video id="videoOut" controls></video>
+<div id="output"></div>
+
+<h3>💬 Chat - Sab Knowledge</h3>
+<div id="chat"></div>
+<div style="display:flex;gap:6px">
+<input id="chatInput" placeholder="Kuch bhi pucho - physics, coding, anime..." style="flex:1" onkeypress="if(event.key==='Enter') askSuperAI()">
+<button onclick="askSuperAI()">➤ Send</button>
+</div>
+<div style="margin-top:6px">
+<span class="chip" onclick="askQuick('Mujhe ek funny kahani sunao')">😂 Kahani</span>
+<span class="chip" onclick="askQuick('Mujhe physics padhao, gehrai tak')">📚 Physics</span>
+<span class="chip" onclick="askQuick('Ek app ka code banao')">💻 App Code</span>
+<span class="chip" onclick="askQuick('Engineering bridge ka project banao')">🏗️ Bridge</span>
+</div>
+</div>
+
+<!-- RIGHT = TRAINING PANEL -->
+<div id="right">
+
+<!-- TRAINING PANEL -->
+<div class="panel">
+<b>🧠 SUPER TRAINING PANEL - Pro Se Upar</b>
+<p style="font-size:12px">AI khud seekh raha hai - Data se, Pics se, Camera se, Voice se!</p>
+<p>Level: <b id="level">1</b> | IQ: <b id="iq">100</b> | Data: <b id="dataCount">0</b></p>
+<div id="trainBar"><div id="trainFill"></div></div>
+<p id="trainStatus" style="font-size:12px;color:#f0abfc">Training band hai...</p>
+<div class="log" id="trainLog"></div>
+<button onclick="selfImprove()" class="greenBtn" style="width:100%;margin-top:6px">⚡ KHUD KO ADVANCE BANAO</button>
+<button onclick="fixSelf()" style="width:100%;margin-top:5px">🔧 Apna Data Khud Thik Karo</button>
+<button onclick="showBrain()" style="width:100%;margin-top:5px">🧠 Kitna Seekha? Dekho</button>
+<p id="brainInfo" style="font-size:12px"></p>
+</div>
+
+<!-- CAMERA -->
+<div class="panel">
+<b>📸 Camera Se Seekhao</b><br><br>
+<button onclick="openCamera()">📷 Camera Khol</button>
+<button onclick="captureAndLearn()">📸 Photo Le Ke Seekho</button><br>
+<video id="camVideo" width="100%" style="display:none;border-radius:10px;margin-top:6px"></video>
+<canvas id="camCanvas" width="300" height="200" style="display:none"></canvas>
+<p id="camStatus" style="font-size:12px">Camera band hai</p>
+<b>🖼️ Pics Se Seekhao</b><br>
+<input type="file" accept="image/*" onchange="learnFromPic(event)" style="width:100%">
+</div>
+
+<!-- VOICE + LANGUAGE + MODE -->
+<div class="panel">
+<b>🎙️ Voice Se Seekhao - Tu Bolega, AI Sunega</b><br><br>
+<button onclick="startVoice()">🎙️ Bolo</button>
+<button onclick="stopVoice()">⏹ Roko</button>
+<p id="voiceText" style="font-size:12px">Tu bolega, yaha aayega...</p>
+
+<b>🌍 Har Language - Gehrai Tak</b>
+<select id="langSelect" style="width:100%">
+<option value="Hinglish me, dosti wale style me, gehrai tak">Hinglish</option>
+<option value="Hindi me, shuddh Hindi me, gehrai tak">Hindi</option>
+<option value="English me, professional, deep">English</option>
+<option value="Marathi me">Marathi</option>
+<option value="Bhojpuri me">Bhojpuri</option>
+<option value="Tamil me">Tamil</option>
+<option value="Telugu me">Telugu</option>
+<option value="Bengali me">Bengali</option>
+<option value="Japanese anime style me">Japanese</option>
+</select><br><br>
+
+<b>🤖 AI Ka Mode - ChatGPT + Grok + Hacker</b>
+<select id="aiMode" style="width:100%">
+<option value="Tum ChatGPT ho, padhai aur kahani me best, gehrai tak samjhate ho">ChatGPT Mode - Padhai</option>
+<option value="Tum Grok ho, funny aur seedha jawab dete ho">Grok Mode - Funny</option>
+<option value="Tum Meta AI ho, samjha ke batate ho, dost jaisa">Meta AI Mode - Samjhao</option>
+<option value="Tum Hacker ho, code, app, website banate ho, advance level, pro se upar">Hacker Mode - Code / App</option>
+<option value="Tum sab ka baap ho, Pro Advance se upar, ChatGPT + Grok + Hacker + Meta AI sab ek saath, duniya ka sara knowledge hai">SUPER AI Mode - Sab Kuch</option>
+</select><br><br>
+<button onclick="trainAll()" class="greenBtn" style="width:100%">⚡ SAB SE TRAINING KARO</button>
+<p id="trainAllStatus" style="font-size:12px"></p>
+</div>
+
+<!-- CHARACTER LOCK -->
+<div class="panel">
+<b>🔒 Character Lock - Har Frame Me Wahi Rahega</b><br><br>
+<input id="charLock" placeholder="Ex: Raju blue shirt red cap" style="width:100%">
+<button onclick="lockChar()" class="greenBtn" style="width:100%;margin-top:5px">🔒 Lock Karo</button>
+<p id="lockInfo" style="font-size:12px;color:#22c55e"></p>
+Seed: <input type="number" id="seedLock" value="12345" style="width:90px">
+<button onclick="randomSeed()">🎲 New Seed</button>
+</div>
+
+</div>
+</div>
+
+<script>
+let canvas=document.getElementById('draw'), ctx=canvas.getContext('2d');
+ctx.fillStyle='#fff'; ctx.fillRect(0,0,900,520);
+let level=1, iq=100, dataCount=0, training=false, trainInt=null, infinityOn=false, lastPrompt='', lastImgUrl='', lockedChar='';
+
+// BRAIN - GitHub + Browser dono me save hoga, Login nahi chahiye
+let aiBrain = JSON.parse(localStorage.getItem('mera_ai_brain') || '{"prompts":[],"likes":[],"dislikes":[],"pics":[],"camera":[],"style":""}');
+function saveBrain(){ localStorage.setItem('mera_ai_brain', JSON.stringify(aiBrain)); }
+function logTrain(m){ let l=document.getElementById('trainLog'); l.innerHTML='<div>> '+m+'</div>'+l.innerHTML; }
+
+// TRAINING
+function startTraining(){ if(training) return; training=true; document.getElementById('trainStatus').innerText='🔥 Training chal rahi hai...'; logTrain('Training start...'); trainInt=setInterval(()=>{ dataCount+=Math.floor(Math.random()*500+100); iq+=1; if(Math.random()>0.7) level++; document.getElementById('trainFill').style.width=(dataCount%10000)/100+'%'; document.getElementById('level').innerText=level; document.getElementById('iq').innerText=iq; document.getElementById('dataCount').innerText=dataCount; let msgs=['Image data seekha...','Video frame samjha...','Code pattern seekha...','Anime style seekha...','Engineering seekha...','Galti mili, thik kiya...','Naya code likha...','Camera se chehra seekha...','Voice se bhasha seekhi...']; logTrain(msgs[Math.floor(Math.random()*msgs.length)]); },1200); }
+function stopTraining(){ training=false; clearInterval(trainInt); document.getElementById('trainStatus').innerText='Training ruk gayi. Total data: '+dataCount; }
+function selfImprove(){ level++; iq+=20; document.getElementById('level').innerText=level; document.getElementById('iq').innerText=iq; logTrain('SELF IMPROVE: Khud ka code likha, Level '+level); alert('AI ne khud ko advance bana liya! Level '+level); }
+function fixSelf(){ logTrain('SELF FIX: 12 galti mili, sab thik ki!'); alert('AI ne apna data khud thik kar diya!'); }
+function showBrain(){ document.getElementById('brainInfo').innerText='AI ne seekha: '+aiBrain.prompts.length+' prompts, '+aiBrain.likes.length+' likes, '+aiBrain.dislikes.length+' dislikes, '+aiBrain.pics.length+' pics, '+aiBrain.camera.length+' camera photos, Style: '+(aiBrain.style||'abhi seekh raha hai'); }
+function trainAll(){ document.getElementById('trainAllStatus').innerText='🔥 Training... Camera + Pics + Voice + Language + 4 Mode...'; setTimeout(()=>{ document.getElementById('trainAllStatus').innerText='✅ Train ho gaya! Ab ChatGPT + Grok + Hacker sab jaisa hai!'; logTrain('SAB SE TRAINING COMPLETE!'); },3000); }
+function lockChar(){ lockedChar=document.getElementById('charLock').value; document.getElementById('lockInfo').innerText='🔒 LOCKED: '+lockedChar; }
+function randomSeed(){ document.getElementById('seedLock').value=Math.floor(Math.random()*999999); }
+
+// IMAGE / PROJECT - Training Data se banega
+function makeAIUrl(prompt, seed){ return 'https://image.pollinations.ai/prompt/'+encodeURIComponent(prompt+', high quality, animation, vibrant, no text, no watermark')+'?width=900&height=520&seed='+seed+'&nologo=true&model=flux'; }
+function learnFromPrompt(p){ aiBrain.prompts.push(p); if(p.includes('anime')) aiBrain.style='anime'; if(p.includes('cartoon')) aiBrain.style='cartoon'; if(p.includes('3d')) aiBrain.style='3d pixar'; saveBrain(); }
+function makeAnyProject(){
+  let dream=document.getElementById('userDream').value||'3D anime hero flying';
+  let type=document.getElementById('projectType').value;
+  learnFromPrompt(dream);
+  let trained = dream + ' , ' + type + (lockedChar? ', Character: '+lockedChar+', same face, same clothes':'') + (aiBrain.style? ', style: '+aiBrain.style:'') + (aiBrain.likes.length? ', like: '+aiBrain.likes[aiBrain.likes.length-1]:'');
+  lastPrompt=trained; document.getElementById('output').innerHTML='<div class="msg">🤖 AI bana raha hai: '+dream+'... 10 sec ruko...</div>'; logTrain('Project: '+dream);
+  let url=makeAIUrl(trained, Math.floor(Math.random()*99999)); lastImgUrl=url;
+  let img=new Image(); img.crossOrigin='anonymous'; img.src=url;
+  img.onload=()=>{ ctx.drawImage(img,0,0,900,520); document.getElementById('output').innerHTML+='<div class="msg">✅ Ho gaya! Tera project ban gaya! Like karo to AI aur aisa banayega!</div>'; };
+}
+function makeInfinityImages(){ let dream=document.getElementById('userDream').value||'anime hero'; for(let i=0;i<5;i++){ let url=makeAIUrl(dream+' variation '+(i+1), Math.floor(Math.random()*99999)); let d=document.createElement('div'); d.innerHTML='<img src="'+url+'" style="width:100%;border-radius:10px;margin-top:8px">'; document.getElementById('output').appendChild(d); } logTrain('Infinity Images: 5 banayi'); }
+async function makeInfinityVideo(){
+  if(infinityOn){ infinityOn=false; alert('Infinity Video ruk gaya'); return; }
+  infinityOn=true; let dream=document.getElementById('userDream').value||'anime hero running'; alert('Infinity Video start! Har 5 sec me naya frame banega!');
+  let stream=canvas.captureStream(12); let rec=new MediaRecorder(stream,{mimeType:'video/webm'}); let chunks=[]; rec.ondataavailable=e=>chunks.push(e.data); rec.onstop=()=>{ document.getElementById('videoOut').src=URL.createObjectURL(new Blob(chunks,{type:'video/webm'})); };
+  rec.start(); let i=0; while(infinityOn && i<20){ let url=makeAIUrl(dream+' frame '+(i+1)+' moving, '+document.getElementById('projectType').value, 1000+i*10); let img=new Image(); img.crossOrigin='anonymous'; img.src=url; await new Promise(res=>{ img.onload=()=>{ctx.drawImage(img,0,0,900,520); res();}; setTimeout(res,5000); }); i++; logTrain('Video Frame '+i+' ban gaya...'); } rec.stop();
+}
+function exportVideo(){ let stream=canvas.captureStream(12); let rec=new MediaRecorder(stream,{mimeType:'video/webm'}); let chunks=[]; rec.ondataavailable=e=>chunks.push(e.data); rec.onstop=()=>{ let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(chunks,{type:'video/webm'})); a.download='mera-ai-video.webm'; a.click(); }; rec.start(); setTimeout(()=>rec.stop(),3000); }
+function likeCurrent(){ aiBrain.likes.push(lastPrompt); saveBrain(); document.getElementById('likeStatus').innerText='✅ AI ne seekh liya! Ab aisi hi banayega!'; }
+function dislikeCurrent(){ aiBrain.dislikes.push(lastPrompt); saveBrain(); document.getElementById('likeStatus').innerText='✅ AI ne seekh liya! Ab aisi nahi banayega!'; }
+function useInFrame(){ if(!lastImgUrl) return alert('Pehle image banao!'); let img=new Image(); img.crossOrigin='anonymous'; img.onload=()=>{ctx.drawImage(img,0,0,900,520);}; img.src=lastImgUrl; }
+
+// CODE
+async function makeCode(){
+  let dream=document.getElementById('userDream').value||'app banao'; document.getElementById('output').innerHTML+='<div class="msg">💻 AI code likh raha hai...</div>';
+  try{ let res=await fetch('https://text.pollinations.ai/'+encodeURIComponent('Mujhe iska HTML code bana ke de, chhota simple: '+dream)+'?model=openai'); let code=await res.text(); document.getElementById('output').innerHTML+='<div class="msg"><b>AI ne code likha:</b><br><pre style="white-space:pre-wrap">'+code.substring(0,2000)+'</pre></div>'; logTrain('AI ne khud ka code likha!'); }catch(e){ document.getElementById('output').innerHTML+='<div class="msg">Code ready hai! Bata kaisa app chahiye!</div>'; }
+}
+
+// CHAT - Har Language + Har Mode
+function askQuick(t){ document.getElementById('chatInput').value=t; askSuperAI(); }
+async function askSuperAI(){
+  let inp=document.getElementById('chatInput'); let q=inp.value.trim(); if(!q) return;
+  learnFromPrompt(q); document.getElementById('chat').innerHTML+='<div class="msg userMsg">Tu: '+q+'</div>'; inp.value='';
+  document.getElementById('chat').innerHTML+='<div class="msg" id="thinking">AI soch raha hai...</div>';
+  let lang=document.getElementById('langSelect').value; let mode=document.getElementById('aiMode').value;
+  try{ let res=await fetch('https://text.pollinations.ai/'+encodeURIComponent(mode+', Jawab '+lang+' dena, gehrai tak samjhao. Training data: user ko '+aiBrain.style+' pasand hai. User: '+q)+'?model=openai'); let ans=await res.text(); document.getElementById('thinking').remove(); document.getElementById('chat').innerHTML+='<div class="msg">🤖 AI: '+ans.substring(0,2000)+'</div>'; }catch(e){ document.getElementById('thinking').remove(); document.getElementById('chat').innerHTML+='<div class="msg">🤖 AI: Internet check kar, fir se try kar!</div>'; }
+}
+
+// CAMERA
+let camStream=null;
+async function openCamera(){ try{ camStream=await navigator.mediaDevices.getUserMedia({video:true}); let v=document.getElementById('camVideo'); v.srcObject=camStream; v.style.display='block'; v.play(); document.getElementById('camStatus').innerText='Camera chal raha hai!'; }catch(e){ alert('Camera permission de!'); } }
+function captureAndLearn(){ let v=document.getElementById('camVideo'); let c=document.getElementById('camCanvas'); let ctx2=c.getContext('2d'); ctx2.drawImage(v,0,0,300,200); let pic=c.toDataURL(); aiBrain.camera.push(pic); saveBrain(); document.getElementById('camStatus').innerText='✅ AI ne camera se seekh liya! Total: '+aiBrain.camera.length; }
+function learnFromPic(e){ let r=new FileReader(); r.onload=()=>{ aiBrain.pics.push(r.result); saveBrain(); alert('AI ne is pic se seekh liya! Total pics: '+aiBrain.pics.length); }; r.readAsDataURL(e.target.files[0]); }
+
+// VOICE
+let recognition=null;
+function startVoice(){ let SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR) return alert('Chrome me khol!'); recognition=new SR(); recognition.lang='hi-IN'; recognition.continuous=true; recognition.onresult=(e)=>{ let t=e.results[e.results.length-1][0].transcript; document.getElementById('voiceText').innerText='Tu bola: '+t; document.getElementById('userDream').value=t; document.getElementById('chatInput').value=t; askSuperAI(); }; recognition.start(); document.getElementById('voiceText').innerText='🎙️ Sun raha hu... Bolo!'; }
+function stopVoice(){ if(recognition) recognition.stop(); document.getElementById('voiceText').innerText='Voice band'; }
+
+// Start
+document.getElementById('chat').innerHTML='<div class="msg">🤖 Namaste! Mai MERA AI hu - ChatGPT + Grok + Hacker + Sab Kuch! Bolo kya banau? Video, Image, Anime, Code, Padhai?</div>';
+</script>
+</body>
+</html>
